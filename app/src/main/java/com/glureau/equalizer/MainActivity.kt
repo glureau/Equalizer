@@ -7,6 +7,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -16,12 +17,16 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.glureau.equalizer.audio.AudioPlayer
 import com.glureau.equalizer.audio.VisualizerComputer
 import com.glureau.equalizer.audio.VisualizerData
 import com.glureau.equalizer.ui.BarEqualizer
+import com.glureau.equalizer.ui.DoubleSidedPathEqualizer
+import com.glureau.equalizer.ui.OneSidedPathEqualizer
 import com.glureau.equalizer.ui.theme.EqualizerTheme
 
 class MainActivity : ComponentActivity() {
@@ -38,7 +43,7 @@ class MainActivity : ComponentActivity() {
                     Content(isPlaying, setPlaying, visualizerData)
                 }
                 if (isPlaying) {
-                    audioPlayer.play(assets, "bensound-hey.mp3", visualizerData)
+                    audioPlayer.play(assets, "bensound-dubstep.mp3", visualizerData)
                 } else {
                     audioPlayer.stop()
                 }
@@ -63,6 +68,7 @@ fun Content(
             Modifier
                 .fillMaxWidth()
                 .height(100.dp)
+                .padding(vertical = 4.dp)
                 .background(Color(0x40000000)),
             barModifier = { _, m -> m.background(Color.Magenta) },
             data = visualizerData.value,
@@ -75,10 +81,52 @@ fun Content(
             Modifier
                 .fillMaxWidth()
                 .height(100.dp)
+                .padding(vertical = 4.dp)
                 .background(Color(0x50000000)),
             barModifier = { i, m -> m.background(someColors[i % someColors.size]) },
             data = visualizerData.value,
             barCount = 64
+        )
+
+        OneSidedPathEqualizer(
+            Modifier
+                .fillMaxWidth()
+                .height(100.dp)
+                .padding(vertical = 4.dp)
+                .background(Color(0x60000000)),
+            data = visualizerData.value,
+            segmentCount = 32,
+            fillBrush = Brush.linearGradient(
+                start = Offset.Zero,
+                end = Offset.Infinite,
+                colors = listOf(
+                    Color.Green,
+                    Color.Red,
+                    Color.Blue,
+                    Color.Yellow,
+                    Color.Magenta,
+                    Color.Green,
+                    Color.Red,
+                    Color.Blue,
+                    Color.Yellow,
+                    Color.Magenta,
+                )
+            )
+        )
+
+        DoubleSidedPathEqualizer(
+            Modifier
+                .fillMaxWidth()
+                .height(100.dp)
+                .padding(vertical = 4.dp)
+                .background(Color(0x70000000)),
+            data = visualizerData.value,
+            segmentCount = 128,
+            fillBrush = Brush.linearGradient(
+                start = Offset.Zero,
+                end = Offset(0f, Float.POSITIVE_INFINITY),
+                colors = listOf(Color.White, Color.Red, Color.White)
+            )
         )
     }
 }
