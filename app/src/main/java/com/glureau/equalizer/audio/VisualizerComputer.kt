@@ -26,8 +26,7 @@ class VisualizerComputer(private val resolution: Int = 32) {
             }
         }
 
-        private val CAPTURE_SIZE =
-            Visualizer.getCaptureSizeRange()[0] // 64 is not enough, not sure why but it ends crashing... TODO: read documentation :)
+        private val CAPTURE_SIZE = Visualizer.getCaptureSizeRange()[0]
     }
 
     private var visualizer: Visualizer? = null
@@ -94,5 +93,4 @@ class VisualizerComputer(private val resolution: Int = 32) {
             signalForce = average
         )
     }
-
 }
