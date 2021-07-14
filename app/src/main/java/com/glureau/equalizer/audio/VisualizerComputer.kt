@@ -10,12 +10,19 @@ import androidx.core.content.ContextCompat
 import kotlin.math.abs
 import kotlin.math.min
 
-class VisualizerComputer(private val resolution: Int = 64) {
+class VisualizerComputer(private val resolution: Int = 32) {
 
     companion object {
         fun setupPermissions(activity: Activity) {
-            if (ContextCompat.checkSelfPermission(activity, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(activity, arrayOf(Manifest.permission.RECORD_AUDIO), 42)
+            if (ContextCompat.checkSelfPermission(
+                    activity,
+                    Manifest.permission.RECORD_AUDIO
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(
+                    activity,
+                    arrayOf(Manifest.permission.RECORD_AUDIO), 42
+                )
             }
         }
 
@@ -76,10 +83,7 @@ class VisualizerComputer(private val resolution: Int = 64) {
         val processed = IntArray(resolution)
         val groupSize = CAPTURE_SIZE / resolution
         for (i in 0 until resolution) {
-            processed[i] = data.map {
-                //Timber.e("$it -> ${it.toInt()} / ${it.toUInt()}")
-                abs(it.toInt())// + 0x7f
-            }
+            processed[i] = data.map { abs(it.toInt()) }
                 .subList(i * groupSize, min((i + 1) * groupSize, data.size))
                 .average().toInt()
         }
