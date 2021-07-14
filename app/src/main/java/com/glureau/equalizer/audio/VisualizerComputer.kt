@@ -5,12 +5,11 @@ import android.Manifest
 import android.app.Activity
 import android.content.pm.PackageManager
 import android.media.audiofx.Visualizer
+import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import kotlin.math.abs
-import kotlin.math.min
 
-class VisualizerComputer(private val resolution: Int = 32) {
+class VisualizerComputer() {
 
     companion object {
         fun setupPermissions(activity: Activity) {
@@ -26,7 +25,7 @@ class VisualizerComputer(private val resolution: Int = 32) {
             }
         }
 
-        private val CAPTURE_SIZE = Visualizer.getCaptureSizeRange()[0]
+        val CAPTURE_SIZE = Visualizer.getCaptureSizeRange()[0]
     }
 
     private var visualizer: Visualizer? = null
@@ -43,13 +42,33 @@ class VisualizerComputer(private val resolution: Int = 32) {
                 //onData(VisualizerData(bytes = process(fft), resolution = resolution))
             }
 
+            var captureCounter = 0
+            var start: Long? = null
+            var lastDataTimestamp: Long? = null
+
             override fun onWaveFormDataCapture(
                 visualizer: Visualizer,
                 waveform: ByteArray,
                 samplingRate: Int
             ) {
+                val now = System.currentTimeMillis()
+                if (start == null) start = now
+                captureCounter++
+                if (captureCounter % 100 == 0) Log.e(
+                    "COUNTER",
+                    "Captured $captureCounter (${captureCounter / ((now - start!!) / 1000.0)} capture/sec)"
+                )
                 //Timber.e("Wave - samplingRate=$samplingRate, waveform=${waveform.joinToString()} thread=" + Thread.currentThread())
-                onData(process(waveform))
+                val durationSinceLastData = lastDataTimestamp?.let { now - it } ?: 0
+                onData(
+                    VisualizerData(
+                        rawWaveform = waveform,
+                        captureSize = CAPTURE_SIZE,
+                        samplingRate = samplingRate,
+                        durationSinceLastData = if (durationSinceLastData < 200) durationSinceLastData else 0
+                    )
+                )
+                lastDataTimestamp = now
             }
         }
 
@@ -66,31 +85,12 @@ class VisualizerComputer(private val resolution: Int = 32) {
                 true,
                 true
             )
+            samplingRate
             enabled = true // Configuration is done, can enable now...
         }
     }
 
     fun stop() {
         visualizer?.release()
-    }
-
-    /**
-     * Capture has to be done
-     */
-    // Returns a color array (Int) of UI_RESOLUTION size
-    private fun process(data: ByteArray): VisualizerData {
-        val processed = IntArray(resolution)
-        val groupSize = CAPTURE_SIZE / resolution
-        for (i in 0 until resolution) {
-            processed[i] = data.map { abs(it.toInt()) }
-                .subList(i * groupSize, min((i + 1) * groupSize, data.size))
-                .average().toInt()
-        }
-        val average = data.map(Byte::toInt).maxOf { it }
-        return VisualizerData(
-            bytes = processed,
-            resolution = resolution,
-            signalForce = average
-        )
     }
 }

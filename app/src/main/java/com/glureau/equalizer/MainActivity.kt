@@ -64,7 +64,21 @@ fun Content(
                 .fillMaxWidth()
                 .height(100.dp)
                 .background(Color(0x40000000)),
-            visualizerData.value
+            barModifier = { _, m -> m.background(Color.Magenta) },
+            data = visualizerData.value,
+            barCount = 32
+        )
+
+        val someColors =
+            listOf(Color.Blue, Color.Green, Color.Yellow, Color.Magenta, Color.Red, Color.Cyan)
+        BarEqualizer(
+            Modifier
+                .fillMaxWidth()
+                .height(100.dp)
+                .background(Color(0x50000000)),
+            barModifier = { i, m -> m.background(someColors[i % someColors.size]) },
+            data = visualizerData.value,
+            barCount = 64
         )
     }
 }

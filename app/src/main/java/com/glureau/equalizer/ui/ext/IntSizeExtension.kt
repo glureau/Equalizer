@@ -1,4 +1,4 @@
-package com.glureau.equalizer.ui
+package com.glureau.equalizer.ui.ext
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalDensity
