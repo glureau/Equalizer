@@ -4,10 +4,11 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -25,8 +26,10 @@ import com.glureau.equalizer.audio.AudioPlayer
 import com.glureau.equalizer.audio.VisualizerComputer
 import com.glureau.equalizer.audio.VisualizerData
 import com.glureau.equalizer.ui.BarEqualizer
+import com.glureau.equalizer.ui.DoubleSidedCircularPathEqualizer
 import com.glureau.equalizer.ui.DoubleSidedPathEqualizer
 import com.glureau.equalizer.ui.OneSidedPathEqualizer
+import com.glureau.equalizer.ui.ext.repeat
 import com.glureau.equalizer.ui.theme.EqualizerTheme
 
 class MainActivity : ComponentActivity() {
@@ -43,7 +46,7 @@ class MainActivity : ComponentActivity() {
                     Content(isPlaying, setPlaying, visualizerData)
                 }
                 if (isPlaying) {
-                    audioPlayer.play(assets, "bensound-dubstep.mp3", visualizerData)
+                    audioPlayer.play(assets, "bensound-hey.mp3", visualizerData)
                 } else {
                     audioPlayer.stop()
                 }
@@ -58,75 +61,98 @@ fun Content(
     setPlaying: (Boolean) -> Unit,
     visualizerData: MutableState<VisualizerData>
 ) {
-    Column {
-        Button(onClick = {
-            setPlaying(!isPlaying)
-        }) {
-            Text(if (isPlaying) "stop" else "play")
-        }
-        BarEqualizer(
-            Modifier
-                .fillMaxWidth()
-                .height(100.dp)
-                .padding(vertical = 4.dp)
-                .background(Color(0x40000000)),
-            barModifier = { _, m -> m.background(Color.Magenta) },
-            data = visualizerData.value,
-            barCount = 32
-        )
+    LazyColumn {
+        item {
+            Button(onClick = {
+                setPlaying(!isPlaying)
+            }) {
+                Text(if (isPlaying) "stop" else "play")
+            }
+        }/*
+        item {
+            BarEqualizer(
+                Modifier
+                    .fillMaxWidth()
+                    .height(100.dp)
+                    .padding(vertical = 4.dp)
+                    .background(Color(0x40000000)),
+                barModifier = { _, m -> m.background(Color.Magenta) },
+                data = visualizerData.value,
+                barCount = 32
+            )
+        }*/
 
         val someColors =
             listOf(Color.Blue, Color.Green, Color.Yellow, Color.Magenta, Color.Red, Color.Cyan)
-        BarEqualizer(
-            Modifier
-                .fillMaxWidth()
-                .height(100.dp)
-                .padding(vertical = 4.dp)
-                .background(Color(0x50000000)),
-            barModifier = { i, m -> m.background(someColors[i % someColors.size]) },
-            data = visualizerData.value,
-            barCount = 64
-        )
 
-        OneSidedPathEqualizer(
-            Modifier
-                .fillMaxWidth()
-                .height(100.dp)
-                .padding(vertical = 4.dp)
-                .background(Color(0x60000000)),
-            data = visualizerData.value,
-            segmentCount = 32,
-            fillBrush = Brush.linearGradient(
-                start = Offset.Zero,
-                end = Offset.Infinite,
-                colors = listOf(
-                    Color.Green,
-                    Color.Red,
-                    Color.Blue,
-                    Color.Yellow,
-                    Color.Magenta,
-                    Color.Green,
-                    Color.Red,
-                    Color.Blue,
-                    Color.Yellow,
-                    Color.Magenta,
+        item {
+            BarEqualizer(
+                Modifier
+                    .fillMaxWidth()
+                    .height(100.dp)
+                    .padding(vertical = 4.dp)
+                    .background(Color(0x50000000)),
+                barModifier = { i, m -> m.background(someColors[i % someColors.size]) },
+                data = visualizerData.value,
+                barCount = 64
+            )
+        }
+        item {
+            OneSidedPathEqualizer(
+                Modifier
+                    .fillMaxWidth()
+                    .height(100.dp)
+                    .padding(vertical = 4.dp)
+                    .background(Color(0x60000000)),
+                data = visualizerData.value,
+                segmentCount = 32,
+                fillBrush = Brush.linearGradient(
+                    start = Offset.Zero,
+                    end = Offset.Infinite,
+                    colors = listOf(
+                        Color.Red,
+                        Color.Yellow,
+                        Color.Green,
+                        Color.Cyan,
+                        Color.Blue,
+                        Color.Magenta,
+                    ).repeat(3)
                 )
             )
-        )
-
-        DoubleSidedPathEqualizer(
-            Modifier
-                .fillMaxWidth()
-                .height(100.dp)
-                .padding(vertical = 4.dp)
-                .background(Color(0x70000000)),
-            data = visualizerData.value,
-            segmentCount = 128,
-            fillBrush = Brush.linearGradient(
-                start = Offset.Zero,
-                end = Offset(0f, Float.POSITIVE_INFINITY),
-                colors = listOf(Color.White, Color.Red, Color.White)
+        }
+        item {
+            DoubleSidedPathEqualizer(
+                Modifier
+                    .fillMaxWidth()
+                    .height(100.dp)
+                    .padding(vertical = 4.dp)
+                    .background(Color(0x70000000)),
+                data = visualizerData.value,
+                segmentCount = 128,
+                fillBrush = Brush.linearGradient(
+                    start = Offset.Zero,
+                    end = Offset(0f, Float.POSITIVE_INFINITY),
+                    colors = listOf(Color.White, Color.Red, Color.White)
+                )
             )
-        )
+        }
+        item {
+            DoubleSidedCircularPathEqualizer(
+                Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(1f)
+                    .padding(vertical = 4.dp)
+                    .background(Color(0xE0000000)),
+                data = visualizerData.value,
+                segmentCount = 256,
+                fillBrush = Brush.radialGradient(
+                    listOf(
+                        Color.Red,
+                        Color.Red,
+                        Color.Yellow,
+                        Color.Green)
+                )
+            )
+        }
     }
 }

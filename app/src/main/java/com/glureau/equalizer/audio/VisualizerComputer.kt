@@ -9,7 +9,7 @@ import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 
-class VisualizerComputer() {
+class VisualizerComputer {
 
     companion object {
         fun setupPermissions(activity: Activity) {
@@ -25,7 +25,7 @@ class VisualizerComputer() {
             }
         }
 
-        val CAPTURE_SIZE = Visualizer.getCaptureSizeRange()[0]
+        val CAPTURE_SIZE = Visualizer.getCaptureSizeRange()[1]
     }
 
     private var visualizer: Visualizer? = null
@@ -52,23 +52,27 @@ class VisualizerComputer() {
                 samplingRate: Int
             ) {
                 val now = System.currentTimeMillis()
+                /*
                 if (start == null) start = now
                 captureCounter++
                 if (captureCounter % 100 == 0) Log.e(
                     "COUNTER",
                     "Captured $captureCounter (${captureCounter / ((now - start!!) / 1000.0)} capture/sec)"
                 )
+                */
                 //Timber.e("Wave - samplingRate=$samplingRate, waveform=${waveform.joinToString()} thread=" + Thread.currentThread())
                 val durationSinceLastData = lastDataTimestamp?.let { now - it } ?: 0
-                onData(
-                    VisualizerData(
-                        rawWaveform = waveform,
-                        captureSize = CAPTURE_SIZE,
-                        samplingRate = samplingRate,
-                        durationSinceLastData = if (durationSinceLastData < 200) durationSinceLastData else 0
+                if (lastDataTimestamp == null || durationSinceLastData > 150) {
+                    onData(
+                        VisualizerData(
+                            rawWaveform = waveform.clone(),
+                            captureSize = CAPTURE_SIZE,
+                            samplingRate = samplingRate,
+                            durationSinceLastData = 0//if (durationSinceLastData < 200) durationSinceLastData else 0
+                        )
                     )
-                )
-                lastDataTimestamp = now
+                    lastDataTimestamp = now
+                }
             }
         }
 
@@ -85,7 +89,6 @@ class VisualizerComputer() {
                 true,
                 true
             )
-            samplingRate
             enabled = true // Configuration is done, can enable now...
         }
     }

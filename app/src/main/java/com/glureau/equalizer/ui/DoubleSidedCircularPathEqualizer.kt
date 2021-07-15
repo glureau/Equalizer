@@ -16,7 +16,7 @@ import com.glureau.equalizer.audio.VisualizerData
 
 
 @Composable
-fun DoubleSidedPathEqualizer(
+fun DoubleSidedCircularPathEqualizer(
     modifier: Modifier,
     data: VisualizerData,
     segmentCount: Int,
@@ -28,11 +28,26 @@ fun DoubleSidedPathEqualizer(
         val viewportHeight = size.height.toFloat()
 
         val resampled = data.resample(segmentCount)
-        val pathData = computeDoubleSidedPoints(resampled, viewportWidth, viewportHeight, segmentCount)
-            .map { p ->
-                val height by animateFloatAsState(targetValue = p.y())
-                PathNode.LineTo(p.x(), height)
-            }
+        val pathData =
+            computeDoubleSidedPoints(
+                resampled,
+                viewportWidth,
+                viewportHeight,
+                segmentCount,
+                continuous = true
+            )
+                .map {
+                    val height by animateFloatAsState(targetValue = it.y())
+                    Point(it.x() to height)
+                }
+                .circularProj(viewportWidth, viewportHeight)
+                .map<Point, PathNode> { p ->
+                    PathNode.LineTo(p.x(), p.y())
+                }
+        val firstPoint = pathData.firstOrNull() as? PathNode.LineTo
+        val firstPath = PathNode.MoveTo(firstPoint?.x ?: 0f, firstPoint?.y ?: 0f)
+        val finalPathData = pathData.toMutableList()
+        finalPathData.add(0, firstPath)
 
         val vectorPainter = rememberVectorPainter(
             defaultWidth = viewportWidth.dp,
@@ -42,7 +57,7 @@ fun DoubleSidedPathEqualizer(
         ) { _, _ ->
             Path(
                 fill = fillBrush,
-                pathData = pathData
+                pathData = finalPathData
             )
         }
         Image(
