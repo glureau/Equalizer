@@ -144,7 +144,7 @@ fun Content(
                     .padding(vertical = 4.dp)
                     .background(Color(0xE0000000)),
                 data = visualizerData.value,
-                segmentCount = 256,
+                segmentCount = 16,
                 fillBrush = Brush.radialGradient(
                     listOf(
                         Color.Red,

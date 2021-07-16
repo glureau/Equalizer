@@ -8,6 +8,13 @@ import kotlin.math.sin
 value class Point(private val p: Pair<Float, Float>) {
     fun x() = p.first
     fun y() = p.second
+
+    operator fun plus(other: Point) = Point(x() + other.x() to y() + other.y())
+    operator fun minus(other: Point) = Point(x() - other.x() to y() - other.y())
+    operator fun times(factor: Float) = Point(x() * factor to y() * factor)
+    operator fun div(factor: Float) = times(1f / factor)
+
+    override fun toString()="[${x()}:${y()}]"
 }
 
 fun computeDoubleSidedPoints(

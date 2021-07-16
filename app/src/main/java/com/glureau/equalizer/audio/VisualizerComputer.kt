@@ -62,7 +62,7 @@ class VisualizerComputer {
                 */
                 //Timber.e("Wave - samplingRate=$samplingRate, waveform=${waveform.joinToString()} thread=" + Thread.currentThread())
                 val durationSinceLastData = lastDataTimestamp?.let { now - it } ?: 0
-                if (lastDataTimestamp == null || durationSinceLastData > 150) {
+                if (lastDataTimestamp == null || durationSinceLastData > 50) {
                     onData(
                         VisualizerData(
                             rawWaveform = waveform.clone(),
