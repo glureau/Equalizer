@@ -61,7 +61,7 @@ fun Content(
     setPlaying: (Boolean) -> Unit,
     visualizerData: MutableState<VisualizerData>
 ) {
-    LazyColumn {
+    LazyColumn(Modifier.padding(2.dp)) {
         item {
             Button(onClick = {
                 setPlaying(!isPlaying)
@@ -144,7 +144,7 @@ fun Content(
                     .padding(vertical = 4.dp)
                     .background(Color(0xE0000000)),
                 data = visualizerData.value,
-                segmentCount = 16,
+                segmentCount = 128,
                 fillBrush = Brush.radialGradient(
                     listOf(
                         Color.Red,

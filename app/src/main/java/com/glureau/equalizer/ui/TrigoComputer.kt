@@ -38,12 +38,12 @@ fun computeDoubleSidedPoints(
             bottom.add(Point(barWidth * (index - 1) to targetValue))
         }
     }
-    return if (!continuous) {
-        top + bottom.reversed()
-    } else {
+    return top + bottom.reversed()//if (!continuous) {
+        //top + bottom.reversed()
+    /*} else {
         // Added 2 points to make it nicer for circular projection
         top + top.first() + bottom.first() + bottom.reversed()
-    }
+    }*/
 }
 
 fun List<Point>.circularProj(viewportWidth: Float, viewportHeight: Float) =
@@ -64,8 +64,9 @@ fun circularProjection(
     val center = Point(viewportWidth / 2 to viewportHeight / 2)
     val innerRadius = innerRadiusRatio * circleRadius
     val outerRadius = (1 - innerRadiusRatio) * circleRadius
+    //val angleOffset = 1f - (1f / points.size)
     return points.mapIndexed { i, p ->
-        val angle = Math.PI.toFloat() * 2 * (p.x() / viewportWidth)
+        val angle = Math.PI.toFloat() * 2 * (p.x() / viewportWidth) //* angleOffset
         val radiusRatio = p.y() / viewportHeight
         val newRadius = innerRadius + outerRadius * radiusRatio
         val x = newRadius * cos(angle) + center.x()

@@ -14,11 +14,11 @@ class AudioPlayer {
         val afd = assets.openFd(fileName)
         player = MediaPlayer().apply {
             setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
+            setVolume(0.01f, 0.01f)
             prepare()
             start()
         }
-        audioComputer.
-        start(audioSessionId = player!!.audioSessionId, onData = { data ->
+        audioComputer.start(audioSessionId = player!!.audioSessionId, onData = { data ->
             visualizerData.value = data
         })
     }
