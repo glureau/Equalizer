@@ -18,7 +18,7 @@ import com.glureau.equalizer.audio.VisualizerData
 
 
 @Composable
-fun StackedBarEqualizer(
+fun CircularStackedBarEqualizer(
     modifier: Modifier,
     data: VisualizerData,
     barCount: Int,
@@ -38,6 +38,7 @@ fun StackedBarEqualizer(
             maxStackCount = maxStackCount,
             padding = padding,
         )
+            .circularProj(viewportWidth, viewportHeight)
             .mapIndexed { index, point ->
             if (index % 4 == 0)
                 PathNode.MoveTo(point.x(), point.y())
@@ -52,9 +53,13 @@ fun StackedBarEqualizer(
             viewportHeight = viewportHeight,
         ) { vw, vh ->
             Path(
-                fill = Brush.linearGradient(
-                    listOf(Color.Red, Color.Yellow, Color.Green),
-                    start = Offset.Zero, end = Offset(0f, Float.POSITIVE_INFINITY)
+                fill = Brush.radialGradient(
+                    listOf(
+                        Color(0xffb3e5fc),
+                        Color(0xffb3e5fc),
+                        Color(0xffffffff),
+                        Color(0xff9575cd),
+                    )
                 ),
                 pathData = nodes
             )

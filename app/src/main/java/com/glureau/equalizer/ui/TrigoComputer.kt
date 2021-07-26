@@ -2,6 +2,7 @@ package com.glureau.equalizer.ui
 
 import kotlin.math.cos
 import kotlin.math.min
+import kotlin.math.roundToInt
 import kotlin.math.sin
 
 @JvmInline
@@ -14,7 +15,7 @@ value class Point(private val p: Pair<Float, Float>) {
     operator fun times(factor: Float) = Point(x() * factor to y() * factor)
     operator fun div(factor: Float) = times(1f / factor)
 
-    override fun toString()="[${x()}:${y()}]"
+    override fun toString() = "[${x()}:${y()}]"
 }
 
 fun computeDoubleSidedPoints(
@@ -39,11 +40,49 @@ fun computeDoubleSidedPoints(
         }
     }
     return top + bottom.reversed()//if (!continuous) {
-        //top + bottom.reversed()
+    //top + bottom.reversed()
     /*} else {
         // Added 2 points to make it nicer for circular projection
         top + top.first() + bottom.first() + bottom.reversed()
     }*/
+}
+
+fun computeStackedBarPoints(
+    resampled: IntArray,
+    viewportWidth: Float,
+    viewportHeight: Float,
+    barCount: Int,
+    maxStackCount: Int,
+    padding: Float,
+): List<Point> {
+    val barWidth = (viewportWidth / barCount) - padding
+    val stackHeightWithPadding = viewportHeight / maxStackCount
+    val stackHeight = stackHeightWithPadding - padding
+
+    val nodes = mutableListOf<Point>()
+    resampled.forEachIndexed { index, d ->
+        //val barHeight by animateFloatAsState(targetValue = viewportHeight * (1 - (d / 128f)))
+        val stackCount = (maxStackCount * (d / 128f)).roundToInt()
+        for (stackIndex in 0..stackCount) {
+            nodes += Point(
+                barWidth * index + padding * index to
+                        viewportHeight - stackIndex * stackHeight - padding * stackIndex
+            )
+            nodes += Point(
+                barWidth * (index + 1) + padding * index to
+                        viewportHeight - stackIndex * stackHeight - padding * stackIndex
+            )
+            nodes += Point(
+                barWidth * (index + 1) + padding * index to
+                        viewportHeight - (stackIndex + 1) * stackHeight - padding * stackIndex
+            )
+            nodes += Point(
+                barWidth * index + padding * index to
+                        viewportHeight - (stackIndex + 1) * stackHeight - padding * stackIndex
+            )
+        }
+    }
+    return nodes
 }
 
 fun List<Point>.circularProj(viewportWidth: Float, viewportHeight: Float) =
@@ -67,7 +106,7 @@ fun circularProjection(
     //val angleOffset = 1f - (1f / points.size)
     return points.mapIndexed { i, p ->
         val angle = Math.PI.toFloat() * 2 * (p.x() / viewportWidth) //* angleOffset
-        val radiusRatio = p.y() / viewportHeight
+        val radiusRatio = 1 - (p.y() / viewportHeight)
         val newRadius = innerRadius + outerRadius * radiusRatio
         val x = newRadius * cos(angle) + center.x()
         val y = newRadius * sin(angle) + center.y()

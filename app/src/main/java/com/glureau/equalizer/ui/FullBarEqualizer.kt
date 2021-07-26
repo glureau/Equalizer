@@ -25,7 +25,7 @@ fun FullBarEqualizer(
         val widthDp = size.getWidthDp()
         val heightDp = size.getHeightDp()
         val padding = 1.dp
-        val barWidthDp = widthDp / barCount
+        val barWidthDp = widthDp / (barCount +2)
 
         data.resample(barCount).forEachIndexed { index, d ->
             val height by animateDpAsState(
@@ -43,7 +43,7 @@ fun FullBarEqualizer(
                     Modifier
                         .width(barWidthDp)
                         .height(height)
-                        .padding(start = if (index == 0) 0.dp else padding)
+                        //.padding(start = if (index == 0) 0.dp else padding)
                         .align(Alignment.Bottom)
                 )
             )

@@ -106,6 +106,18 @@ fun Content(
             )
         }
         item {
+            CircularStackedBarEqualizer(
+                Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(1f)
+                    .padding(vertical = 4.dp)
+                    .background(Color(0xff111111)),
+                data = visualizerData.value,
+                barCount = 50,
+                maxStackCount = 16
+            )
+        }
+        item {
             OneSidedPathEqualizer(
                 Modifier
                     .fillMaxWidth()
