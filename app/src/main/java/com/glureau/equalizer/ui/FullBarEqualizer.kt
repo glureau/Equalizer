@@ -14,7 +14,7 @@ import com.glureau.equalizer.ui.ext.getWidthDp
 
 
 @Composable
-fun BarEqualizer(
+fun FullBarEqualizer(
     modifier: Modifier,
     barModifier: (Int, Modifier) -> Modifier,
     data: VisualizerData,

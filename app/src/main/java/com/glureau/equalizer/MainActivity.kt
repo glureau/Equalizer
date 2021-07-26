@@ -25,10 +25,7 @@ import androidx.compose.ui.unit.dp
 import com.glureau.equalizer.audio.AudioPlayer
 import com.glureau.equalizer.audio.VisualizerComputer
 import com.glureau.equalizer.audio.VisualizerData
-import com.glureau.equalizer.ui.BarEqualizer
-import com.glureau.equalizer.ui.DoubleSidedCircularPathEqualizer
-import com.glureau.equalizer.ui.DoubleSidedPathEqualizer
-import com.glureau.equalizer.ui.OneSidedPathEqualizer
+import com.glureau.equalizer.ui.*
 import com.glureau.equalizer.ui.ext.repeat
 import com.glureau.equalizer.ui.theme.EqualizerTheme
 
@@ -70,7 +67,7 @@ fun Content(
             }
         }/*
         item {
-            BarEqualizer(
+            FullBarEqualizer(
                 Modifier
                     .fillMaxWidth()
                     .height(100.dp)
@@ -86,13 +83,24 @@ fun Content(
             listOf(Color.Blue, Color.Green, Color.Yellow, Color.Magenta, Color.Red, Color.Cyan)
 
         item {
-            BarEqualizer(
+            FullBarEqualizer(
                 Modifier
                     .fillMaxWidth()
                     .height(100.dp)
                     .padding(vertical = 4.dp)
                     .background(Color(0x50000000)),
                 barModifier = { i, m -> m.background(someColors[i % someColors.size]) },
+                data = visualizerData.value,
+                barCount = 64
+            )
+        }
+        item {
+            StackedBarEqualizer(
+                Modifier
+                    .fillMaxWidth()
+                    .height(100.dp)
+                    .padding(vertical = 4.dp)
+                    .background(Color(0x50000000)),
                 data = visualizerData.value,
                 barCount = 64
             )
