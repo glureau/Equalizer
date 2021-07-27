@@ -40,7 +40,12 @@ fun DoubleSidedCircularPathEqualizer(
                 val height by animateFloatAsState(targetValue = it.y())
                 Point(it.x() to height)
             }
-                .circularProj(viewportWidth, viewportHeight)
+                .circularProj(
+                    viewportWidth = viewportWidth,
+                    viewportHeight = viewportHeight,
+                    innerRadiusRatio = 0.5f,
+                    outerRadiusRatio = 0.8f
+                )
 
             /*val pathData = circularProj
             .map<Point, PathNode> { p ->
@@ -53,7 +58,7 @@ fun DoubleSidedCircularPathEqualizer(
             Log.e("DEV", "TOP=" + circularProj.subList(0, halfCount).joinToString())
             Log.e("DEV", "BOTTOM=" + circularProj.subList(halfCount, count).joinToString())
             pathData += PathNode.MoveTo(circularProj[offset].x(), circularProj[offset].y())
-            for (i in 0..halfCount-1) {
+            for (i in 0..halfCount - 1) {
                 val prevprev = circularProj[(i - 2 + halfCount) % halfCount]
                 val prev = circularProj[(i - 1 + halfCount) % halfCount]
                 val current = circularProj[i]
@@ -70,8 +75,8 @@ fun DoubleSidedCircularPathEqualizer(
                 )
             }
 
-            pathData += PathNode.LineTo(circularProj[count-1].x(), circularProj[count-1].y())
-            for (i in 0..halfCount-1) {
+            pathData += PathNode.LineTo(circularProj[count - 1].x(), circularProj[count - 1].y())
+            for (i in 0..halfCount - 1) {
                 val prevprev = circularProj[((i - 2 + halfCount) % halfCount) + halfCount]
                 val prev = circularProj[((i - 1 + halfCount) % halfCount) + halfCount]
                 val current = circularProj[i + halfCount]

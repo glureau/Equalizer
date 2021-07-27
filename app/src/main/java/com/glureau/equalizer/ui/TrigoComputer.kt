@@ -1,9 +1,6 @@
 package com.glureau.equalizer.ui
 
-import kotlin.math.cos
-import kotlin.math.min
-import kotlin.math.roundToInt
-import kotlin.math.sin
+import kotlin.math.*
 
 @JvmInline
 value class Point(private val p: Pair<Float, Float>) {
@@ -53,11 +50,12 @@ fun computeStackedBarPoints(
     viewportHeight: Float,
     barCount: Int,
     maxStackCount: Int,
-    padding: Float,
+    horizontalPadding: Float,
+    verticalPadding: Float,
 ): List<Point> {
-    val barWidth = (viewportWidth / barCount) - padding
+    val barWidth = (viewportWidth / barCount) - horizontalPadding
     val stackHeightWithPadding = viewportHeight / maxStackCount
-    val stackHeight = stackHeightWithPadding - padding
+    val stackHeight = stackHeightWithPadding - verticalPadding
 
     val nodes = mutableListOf<Point>()
     resampled.forEachIndexed { index, d ->
@@ -65,28 +63,44 @@ fun computeStackedBarPoints(
         val stackCount = (maxStackCount * (d / 128f)).roundToInt()
         for (stackIndex in 0..stackCount) {
             nodes += Point(
-                barWidth * index + padding * index to
-                        viewportHeight - stackIndex * stackHeight - padding * stackIndex
+                barWidth * index + horizontalPadding * index to
+                        viewportHeight - stackIndex * stackHeight - verticalPadding * stackIndex
             )
             nodes += Point(
-                barWidth * (index + 1) + padding * index to
-                        viewportHeight - stackIndex * stackHeight - padding * stackIndex
+                barWidth * (index + 1) + horizontalPadding * index to
+                        viewportHeight - stackIndex * stackHeight - verticalPadding * stackIndex
             )
             nodes += Point(
-                barWidth * (index + 1) + padding * index to
-                        viewportHeight - (stackIndex + 1) * stackHeight - padding * stackIndex
+                barWidth * (index + 1) + horizontalPadding * index to
+                        viewportHeight - (stackIndex + 1) * stackHeight - verticalPadding * stackIndex
             )
             nodes += Point(
-                barWidth * index + padding * index to
-                        viewportHeight - (stackIndex + 1) * stackHeight - padding * stackIndex
+                barWidth * index + horizontalPadding * index to
+                        viewportHeight - (stackIndex + 1) * stackHeight - verticalPadding * stackIndex
             )
         }
     }
     return nodes
 }
 
-fun List<Point>.circularProj(viewportWidth: Float, viewportHeight: Float) =
-    circularProjection(this, viewportWidth, viewportHeight)
+fun List<Point>.circularProj(
+    viewportWidth: Float,
+    viewportHeight: Float,
+    // 0f = no inner radius, 1f = everything is applied on the external circle
+    innerRadiusRatio: Float = 0.4f,
+    outerRadiusRatio: Float = 1.414f,
+    stretchRadiusRatio: Float = 1f,// in [0;1], unrelated with other radius ratio, applied to move the effect neutral point
+    stretchPow: Float = 1.6f // tunnel effect
+) =
+    circularProjection(
+        this,
+        viewportWidth,
+        viewportHeight,
+        innerRadiusRatio,
+        outerRadiusRatio,
+        stretchRadiusRatio,
+        stretchPow
+    )
 
 /**
  * Take points in a rectangle and project them on a disk,
@@ -97,17 +111,21 @@ fun circularProjection(
     viewportWidth: Float,
     viewportHeight: Float,
     // 0f = no inner radius, 1f = everything is applied on the external circle
-    innerRadiusRatio: Float = 0.4f,
+    innerRadiusRatio: Float,
+    outerRadiusRatio: Float,
+    stretchRadiusRatio: Float,// in [0;1], unrelated with other radius ratio, applied to move the effect neutral point
+    stretchPow: Float // tunnel effect
 ): List<Point> {
     val circleRadius = min(viewportWidth, viewportHeight) / 2
     val center = Point(viewportWidth / 2 to viewportHeight / 2)
     val innerRadius = innerRadiusRatio * circleRadius
-    val outerRadius = (1 - innerRadiusRatio) * circleRadius
+    val outerRadius = outerRadiusRatio * circleRadius
     //val angleOffset = 1f - (1f / points.size)
     return points.mapIndexed { i, p ->
         val angle = Math.PI.toFloat() * 2 * (p.x() / viewportWidth) //* angleOffset
         val radiusRatio = 1 - (p.y() / viewportHeight)
-        val newRadius = innerRadius + outerRadius * radiusRatio
+        val stretchedRadiusRatio = (radiusRatio / stretchRadiusRatio).pow(stretchPow)
+        val newRadius = lerp(innerRadius, outerRadius, stretchedRadiusRatio)
         val x = newRadius * cos(angle) + center.x()
         val y = newRadius * sin(angle) + center.y()
         /*Log.e(
@@ -115,5 +133,38 @@ fun circularProjection(
             "viewportWidth=$viewportWidth viewportHeight=$viewportHeight i=$i  -- $x $y"
         )*/
         Point(x to y)
+    }
+}
+
+fun lerp(a: Float, b: Float, factor: Float): Float {
+    return a + ((b - a) * factor)
+}
+
+fun List<Point>.circularStretch(viewportWidth: Float, viewportHeight: Float) =
+    circularStretch(this, viewportWidth, viewportHeight)
+
+
+fun circularStretch(
+    points: List<Point>,
+    viewportWidth: Float,
+    viewportHeight: Float,
+    baseRadiusRatio: Float = 0.5f,// points on this radius will not move
+    stretchFactorOutside: Float = 1.1f,
+): List<Point> {
+    val centerX = viewportWidth / 2
+    val centerY = viewportHeight / 2
+    val baseDist = (min(viewportWidth, viewportHeight) / 2) * baseRadiusRatio
+    return points.map {
+        val diffX = it.x() - centerX
+        val diffY = it.y() - centerY
+        val radius = sqrt(diffX * diffX + diffY * diffY)
+        if (radius - baseDist > 0) {
+            it * 1.1f
+            //radius * 1.1
+        } else {
+            it * 0.9f
+            //radius * 0.9
+        }
+        //val stretchedRadius = radius*AERAR
     }
 }

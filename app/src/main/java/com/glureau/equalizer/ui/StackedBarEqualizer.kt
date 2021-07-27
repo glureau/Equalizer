@@ -36,7 +36,8 @@ fun StackedBarEqualizer(
             viewportHeight = viewportHeight,
             barCount = barCount,
             maxStackCount = maxStackCount,
-            padding = padding,
+            horizontalPadding = padding,
+            verticalPadding = padding,
         )
             .mapIndexed { index, point ->
             if (index % 4 == 0)

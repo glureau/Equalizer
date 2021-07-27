@@ -4,7 +4,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.Path
@@ -28,23 +27,45 @@ fun CircularStackedBarEqualizer(
     Row(modifier.onSizeChanged { size = it }) {
         val viewportWidth = size.width.toFloat()
         val viewportHeight = size.height.toFloat()
-        val padding = LocalDensity.current.run { 1.dp.toPx() }
+        val horizontalPadding = LocalDensity.current.run { 2.dp.toPx() }
+        val verticalPadding = LocalDensity.current.run { 4.dp.toPx() }
 
-        val nodes = computeStackedBarPoints(
+        val stackedBar = computeStackedBarPoints(
             resampled = data.resample(barCount),
             viewportWidth = viewportWidth,
             viewportHeight = viewportHeight,
             barCount = barCount,
             maxStackCount = maxStackCount,
-            padding = padding,
+            horizontalPadding = horizontalPadding,
+            verticalPadding = verticalPadding,
         )
-            .circularProj(viewportWidth, viewportHeight)
+        val points = stackedBar.circularProj(
+            viewportWidth = viewportWidth,
+            viewportHeight = viewportHeight,
+            innerRadiusRatio = 0.25f,
+            outerRadiusRatio = 0.3f,
+            stretchPow = 1.6f // tunnel effect
+        ) + stackedBar.circularProj(
+            viewportWidth = viewportWidth,
+            viewportHeight = viewportHeight,
+            innerRadiusRatio = 0.4f,
+            outerRadiusRatio = 0.6f,
+            stretchPow = 1.6f // tunnel effect
+        ) + stackedBar.circularProj(
+            viewportWidth = viewportWidth,
+            viewportHeight = viewportHeight,
+            innerRadiusRatio = 0.7f,
+            outerRadiusRatio = 1.414f,
+            stretchPow = 1.6f // tunnel effect
+        )
+
+        val nodes = points
             .mapIndexed { index, point ->
-            if (index % 4 == 0)
-                PathNode.MoveTo(point.x(), point.y())
-            else
-                PathNode.LineTo(point.x(), point.y())
-        }
+                if (index % 4 == 0)
+                    PathNode.MoveTo(point.x(), point.y())
+                else
+                    PathNode.LineTo(point.x(), point.y())
+            }
 
         val vectorPainter = rememberVectorPainter(
             defaultWidth = viewportWidth.dp,

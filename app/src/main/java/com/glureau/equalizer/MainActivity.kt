@@ -43,7 +43,7 @@ class MainActivity : ComponentActivity() {
                     Content(isPlaying, setPlaying, visualizerData)
                 }
                 if (isPlaying) {
-                    audioPlayer.play(assets, "bensound-hey.mp3", visualizerData)
+                    audioPlayer.play(assets, "bensound-dubstep.mp3", visualizerData)
                 } else {
                     audioPlayer.stop()
                 }
@@ -113,7 +113,7 @@ fun Content(
                     .padding(vertical = 4.dp)
                     .background(Color(0xff111111)),
                 data = visualizerData.value,
-                barCount = 50,
+                barCount = 48,
                 maxStackCount = 16
             )
         }
