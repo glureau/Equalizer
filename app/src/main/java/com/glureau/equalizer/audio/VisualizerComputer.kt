@@ -26,6 +26,8 @@ class VisualizerComputer {
         }
 
         val CAPTURE_SIZE = Visualizer.getCaptureSizeRange()[1]
+
+        const val SAMPLING_INTERVAL = 150
     }
 
     private var visualizer: Visualizer? = null
@@ -62,7 +64,7 @@ class VisualizerComputer {
                 */
                 //Timber.e("Wave - samplingRate=$samplingRate, waveform=${waveform.joinToString()} thread=" + Thread.currentThread())
                 val durationSinceLastData = lastDataTimestamp?.let { now - it } ?: 0
-                if (lastDataTimestamp == null || durationSinceLastData > 50) {
+                if (lastDataTimestamp == null || durationSinceLastData > SAMPLING_INTERVAL) {
                     onData(
                         VisualizerData(
                             rawWaveform = waveform.clone(),

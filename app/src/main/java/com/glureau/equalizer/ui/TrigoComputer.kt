@@ -1,5 +1,10 @@
 package com.glureau.equalizer.ui
 
+import androidx.compose.animation.core.animateIntAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.vector.PathNode
+import com.glureau.equalizer.audio.VisualizerComputer.Companion.SAMPLING_INTERVAL
 import kotlin.math.*
 
 @JvmInline
@@ -44,6 +49,7 @@ fun computeDoubleSidedPoints(
     }*/
 }
 
+@Composable
 fun computeStackedBarPoints(
     resampled: IntArray,
     viewportWidth: Float,
@@ -60,8 +66,12 @@ fun computeStackedBarPoints(
     val nodes = mutableListOf<Point>()
     resampled.forEachIndexed { index, d ->
         //val barHeight by animateFloatAsState(targetValue = viewportHeight * (1 - (d / 128f)))
-        val stackCount = (maxStackCount * (d / 128f)).roundToInt()
-        for (stackIndex in 0..stackCount) {
+        //val stackCount  = (maxStackCount * (d / 128f)).roundToInt()
+        val stackCount = animateIntAsState(
+            (maxStackCount * (d / 128f)).roundToInt(),
+            animationSpec = tween(durationMillis = SAMPLING_INTERVAL)
+        )
+        for (stackIndex in 0..stackCount.value) {
             nodes += Point(
                 barWidth * index + horizontalPadding * index to
                         viewportHeight - stackIndex * stackHeight - verticalPadding * stackIndex
@@ -83,23 +93,32 @@ fun computeStackedBarPoints(
     return nodes
 }
 
+fun List<Point>.stackToNodes() = this.mapIndexed { index, point ->
+    if (index % 4 == 0)
+        PathNode.MoveTo(point.x(), point.y())
+    else
+        PathNode.LineTo(point.x(), point.y())
+}
+
 fun List<Point>.circularProj(
     viewportWidth: Float,
     viewportHeight: Float,
     // 0f = no inner radius, 1f = everything is applied on the external circle
     innerRadiusRatio: Float = 0.4f,
     outerRadiusRatio: Float = 1.414f,
+    angleOffset: Float = 0f,
     stretchRadiusRatio: Float = 1f,// in [0;1], unrelated with other radius ratio, applied to move the effect neutral point
     stretchPow: Float = 1.6f // tunnel effect
 ) =
     circularProjection(
-        this,
-        viewportWidth,
-        viewportHeight,
-        innerRadiusRatio,
-        outerRadiusRatio,
-        stretchRadiusRatio,
-        stretchPow
+        points = this,
+        viewportWidth = viewportWidth,
+        viewportHeight = viewportHeight,
+        innerRadiusRatio = innerRadiusRatio,
+        outerRadiusRatio = outerRadiusRatio,
+        angleOffset = angleOffset,
+        stretchRadiusRatio = stretchRadiusRatio,
+        stretchPow = stretchPow
     )
 
 /**
@@ -113,6 +132,7 @@ fun circularProjection(
     // 0f = no inner radius, 1f = everything is applied on the external circle
     innerRadiusRatio: Float,
     outerRadiusRatio: Float,
+    angleOffset: Float,
     stretchRadiusRatio: Float,// in [0;1], unrelated with other radius ratio, applied to move the effect neutral point
     stretchPow: Float // tunnel effect
 ): List<Point> {
@@ -120,9 +140,8 @@ fun circularProjection(
     val center = Point(viewportWidth / 2 to viewportHeight / 2)
     val innerRadius = innerRadiusRatio * circleRadius
     val outerRadius = outerRadiusRatio * circleRadius
-    //val angleOffset = 1f - (1f / points.size)
     return points.mapIndexed { i, p ->
-        val angle = Math.PI.toFloat() * 2 * (p.x() / viewportWidth) //* angleOffset
+        val angle = angleOffset + Math.PI.toFloat() * 2 * (p.x() / viewportWidth)
         val radiusRatio = 1 - (p.y() / viewportHeight)
         val stretchedRadiusRatio = (radiusRatio / stretchRadiusRatio).pow(stretchPow)
         val newRadius = lerp(innerRadius, outerRadius, stretchedRadiusRatio)

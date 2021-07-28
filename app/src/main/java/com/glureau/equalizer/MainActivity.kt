@@ -43,7 +43,7 @@ class MainActivity : ComponentActivity() {
                     Content(isPlaying, setPlaying, visualizerData)
                 }
                 if (isPlaying) {
-                    audioPlayer.play(assets, "bensound-dubstep.mp3", visualizerData)
+                    audioPlayer.play(assets, "bensound-evolution.mp3", visualizerData)
                 } else {
                     audioPlayer.stop()
                 }
@@ -82,27 +82,17 @@ fun Content(
         val someColors =
             listOf(Color.Blue, Color.Green, Color.Yellow, Color.Magenta, Color.Red, Color.Cyan)
 
+
         item {
-            FullBarEqualizer(
+            FancyTubularStackedBarEqualizer(
                 Modifier
                     .fillMaxWidth()
-                    .height(100.dp)
+                    .aspectRatio(1f)
                     .padding(vertical = 4.dp)
-                    .background(Color(0x50000000)),
-                barModifier = { i, m -> m.background(someColors[i % someColors.size]) },
+                    .background(Color(0xff111111)),
                 data = visualizerData.value,
-                barCount = 64
-            )
-        }
-        item {
-            StackedBarEqualizer(
-                Modifier
-                    .fillMaxWidth()
-                    .height(100.dp)
-                    .padding(vertical = 4.dp)
-                    .background(Color(0x50000000)),
-                data = visualizerData.value,
-                barCount = 64
+                barCount = 48,
+                maxStackCount = 16
             )
         }
         item {
@@ -115,6 +105,30 @@ fun Content(
                 data = visualizerData.value,
                 barCount = 48,
                 maxStackCount = 16
+            )
+        }
+
+        item {
+            StackedBarEqualizer(
+                Modifier
+                    .fillMaxWidth()
+                    .height(100.dp)
+                    .padding(vertical = 4.dp)
+                    .background(Color(0x50000000)),
+                data = visualizerData.value,
+                barCount = 64
+            )
+        }
+        item {
+            FullBarEqualizer(
+                Modifier
+                    .fillMaxWidth()
+                    .height(100.dp)
+                    .padding(vertical = 4.dp)
+                    .background(Color(0x50000000)),
+                barModifier = { i, m -> m.background(someColors[i % someColors.size]) },
+                data = visualizerData.value,
+                barCount = 64
             )
         }
         item {
@@ -170,7 +184,8 @@ fun Content(
                         Color.Red,
                         Color.Red,
                         Color.Yellow,
-                        Color.Green)
+                        Color.Green
+                    )
                 )
             )
         }

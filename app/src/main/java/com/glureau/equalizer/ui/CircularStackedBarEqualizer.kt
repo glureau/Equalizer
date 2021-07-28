@@ -42,21 +42,9 @@ fun CircularStackedBarEqualizer(
         val points = stackedBar.circularProj(
             viewportWidth = viewportWidth,
             viewportHeight = viewportHeight,
-            innerRadiusRatio = 0.25f,
-            outerRadiusRatio = 0.3f,
-            stretchPow = 1.6f // tunnel effect
-        ) + stackedBar.circularProj(
-            viewportWidth = viewportWidth,
-            viewportHeight = viewportHeight,
-            innerRadiusRatio = 0.4f,
-            outerRadiusRatio = 0.6f,
-            stretchPow = 1.6f // tunnel effect
-        ) + stackedBar.circularProj(
-            viewportWidth = viewportWidth,
-            viewportHeight = viewportHeight,
-            innerRadiusRatio = 0.7f,
-            outerRadiusRatio = 1.414f,
-            stretchPow = 1.6f // tunnel effect
+            innerRadiusRatio = 0.1f,
+            outerRadiusRatio = 1.0f,
+            stretchPow = 1f
         )
 
         val nodes = points
