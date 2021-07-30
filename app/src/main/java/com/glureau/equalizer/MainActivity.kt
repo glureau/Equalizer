@@ -43,7 +43,7 @@ class MainActivity : ComponentActivity() {
                     Content(isPlaying, setPlaying, visualizerData)
                 }
                 if (isPlaying) {
-                    audioPlayer.play(assets, "bensound-evolution.mp3", visualizerData)
+                    audioPlayer.play(assets, "instru.mp3", visualizerData)
                 } else {
                     audioPlayer.stop()
                 }
@@ -58,11 +58,14 @@ fun Content(
     setPlaying: (Boolean) -> Unit,
     visualizerData: MutableState<VisualizerData>
 ) {
-    LazyColumn(Modifier.padding(2.dp)) {
+    LazyColumn {
         item {
-            Button(onClick = {
-                setPlaying(!isPlaying)
-            }) {
+            Button(
+                onClick = {
+                    setPlaying(!isPlaying)
+                },
+                modifier = Modifier.padding(2.dp),
+            ) {
                 Text(if (isPlaying) "stop" else "play")
             }
         }/*
@@ -88,8 +91,7 @@ fun Content(
                 Modifier
                     .fillMaxWidth()
                     .aspectRatio(1f)
-                    .padding(vertical = 4.dp)
-                    .background(Color(0xff111111)),
+                    .padding(vertical = 4.dp),
                 data = visualizerData.value,
                 barCount = 48,
                 maxStackCount = 16
@@ -100,7 +102,6 @@ fun Content(
                 Modifier
                     .fillMaxWidth()
                     .aspectRatio(1f)
-                    .padding(vertical = 4.dp)
                     .background(Color(0xff111111)),
                 data = visualizerData.value,
                 barCount = 48,
