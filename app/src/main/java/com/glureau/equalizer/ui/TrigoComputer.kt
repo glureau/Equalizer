@@ -147,10 +147,6 @@ fun circularProjection(
         val newRadius = lerp(innerRadius, outerRadius, stretchedRadiusRatio)
         val x = newRadius * cos(angle) + center.x()
         val y = newRadius * sin(angle) + center.y()
-        /*Log.e(
-            "LOG",
-            "viewportWidth=$viewportWidth viewportHeight=$viewportHeight i=$i  -- $x $y"
-        )*/
         Point(x to y)
     }
 }

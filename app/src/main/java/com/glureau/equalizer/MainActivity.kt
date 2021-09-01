@@ -68,127 +68,128 @@ fun Content(
             ) {
                 Text(if (isPlaying) "stop" else "play")
             }
-        }/*
-        item {
-            FullBarEqualizer(
-                Modifier
-                    .fillMaxWidth()
-                    .height(100.dp)
-                    .padding(vertical = 4.dp)
-                    .background(Color(0x40000000)),
-                barModifier = { _, m -> m.background(Color.Magenta) },
-                data = visualizerData.value,
-                barCount = 32
-            )
-        }*/
+        }
 
         val someColors =
             listOf(Color.Blue, Color.Green, Color.Yellow, Color.Magenta, Color.Red, Color.Cyan)
+        val displayAllItems = false
+        val selectItemIndex = 0
 
-
-        item {
-            FancyTubularStackedBarEqualizer(
-                Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(1f)
-                    .padding(vertical = 4.dp),
-                data = visualizerData.value,
-                barCount = 48,
-                maxStackCount = 16
-            )
-        }
-        item {
-            CircularStackedBarEqualizer(
-                Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(1f)
-                    .background(Color(0xff111111)),
-                data = visualizerData.value,
-                barCount = 48,
-                maxStackCount = 16
-            )
-        }
-
-        item {
-            StackedBarEqualizer(
-                Modifier
-                    .fillMaxWidth()
-                    .height(100.dp)
-                    .padding(vertical = 4.dp)
-                    .background(Color(0x50000000)),
-                data = visualizerData.value,
-                barCount = 64
-            )
-        }
-        item {
-            FullBarEqualizer(
-                Modifier
-                    .fillMaxWidth()
-                    .height(100.dp)
-                    .padding(vertical = 4.dp)
-                    .background(Color(0x50000000)),
-                barModifier = { i, m -> m.background(someColors[i % someColors.size]) },
-                data = visualizerData.value,
-                barCount = 64
-            )
-        }
-        item {
-            OneSidedPathEqualizer(
-                Modifier
-                    .fillMaxWidth()
-                    .height(100.dp)
-                    .padding(vertical = 4.dp)
-                    .background(Color(0x60000000)),
-                data = visualizerData.value,
-                segmentCount = 32,
-                fillBrush = Brush.linearGradient(
-                    start = Offset.Zero,
-                    end = Offset.Infinite,
-                    colors = listOf(
-                        Color.Red,
-                        Color.Yellow,
-                        Color.Green,
-                        Color.Cyan,
-                        Color.Blue,
-                        Color.Magenta,
-                    ).repeat(3)
+        if (displayAllItems || (selectItemIndex == 0))
+            item {
+                FancyTubularStackedBarEqualizer(
+                    Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(1f)
+                        .padding(vertical = 4.dp),
+                    data = visualizerData.value,
+                    barCount = 48,
+                    maxStackCount = 16,
                 )
-            )
-        }
-        item {
-            DoubleSidedPathEqualizer(
-                Modifier
-                    .fillMaxWidth()
-                    .height(100.dp)
-                    .padding(vertical = 4.dp)
-                    .background(Color(0x70000000)),
-                data = visualizerData.value,
-                segmentCount = 128,
-                fillBrush = Brush.linearGradient(
-                    start = Offset.Zero,
-                    end = Offset(0f, Float.POSITIVE_INFINITY),
-                    colors = listOf(Color.White, Color.Red, Color.White)
+            }
+
+        if (displayAllItems || (selectItemIndex == 1))
+            item {
+                CircularStackedBarEqualizer(
+                    Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(1f)
+                        .background(Color(0xff111111)),
+                    data = visualizerData.value,
+                    barCount = 48,
+                    maxStackCount = 16
                 )
-            )
-        }
-        item {
-            DoubleSidedCircularPathEqualizer(
-                Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(1f)
-                    .padding(vertical = 4.dp)
-                    .background(Color(0xE0000000)),
-                data = visualizerData.value,
-                segmentCount = 128,
-                fillBrush = Brush.radialGradient(
-                    listOf(
-                        Color.Red,
-                        Color.Red,
-                        Color.Yellow,
-                        Color.Green
+            }
+
+        if (displayAllItems || (selectItemIndex == 2))
+            item {
+                StackedBarEqualizer(
+                    Modifier
+                        .fillMaxWidth()
+                        .height(100.dp)
+                        .padding(vertical = 4.dp)
+                        .background(Color(0x50000000)),
+                    data = visualizerData.value,
+                    barCount = 64
+                )
+            }
+
+        if (displayAllItems || (selectItemIndex == 3))
+            item {
+                FullBarEqualizer(
+                    Modifier
+                        .fillMaxWidth()
+                        .height(100.dp)
+                        .padding(vertical = 4.dp)
+                        .background(Color(0x50000000)),
+                    barModifier = { i, m -> m.background(someColors[i % someColors.size]) },
+                    data = visualizerData.value,
+                    barCount = 64
+                )
+            }
+
+        if (displayAllItems || (selectItemIndex == 4))
+            item {
+                OneSidedPathEqualizer(
+                    Modifier
+                        .fillMaxWidth()
+                        .height(100.dp)
+                        .padding(vertical = 4.dp)
+                        .background(Color(0x60000000)),
+                    data = visualizerData.value,
+                    segmentCount = 32,
+                    fillBrush = Brush.linearGradient(
+                        start = Offset.Zero,
+                        end = Offset.Infinite,
+                        colors = listOf(
+                            Color.Red,
+                            Color.Yellow,
+                            Color.Green,
+                            Color.Cyan,
+                            Color.Blue,
+                            Color.Magenta,
+                        ).repeat(3)
                     )
                 )
-            )
-        }
+            }
+
+        if (displayAllItems || (selectItemIndex == 5))
+            item {
+                DoubleSidedPathEqualizer(
+                    Modifier
+                        .fillMaxWidth()
+                        .height(100.dp)
+                        .padding(vertical = 4.dp)
+                        .background(Color(0x70000000)),
+                    data = visualizerData.value,
+                    segmentCount = 128,
+                    fillBrush = Brush.linearGradient(
+                        start = Offset.Zero,
+                        end = Offset(0f, Float.POSITIVE_INFINITY),
+                        colors = listOf(Color.White, Color.Red, Color.White)
+                    )
+                )
+            }
+
+        if (displayAllItems || (selectItemIndex == 6))
+            item {
+                DoubleSidedCircularPathEqualizer(
+                    Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(1f)
+                        .padding(vertical = 4.dp)
+                        .background(Color(0xE0000000)),
+                    data = visualizerData.value,
+                    segmentCount = 128,
+                    fillBrush = Brush.radialGradient(
+                        listOf(
+                            Color.Red,
+                            Color.Red,
+                            Color.Yellow,
+                            Color.Green
+                        )
+                    )
+                )
+            }
     }
 }

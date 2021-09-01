@@ -1,6 +1,5 @@
 package com.glureau.equalizer.ui
 
-import android.util.Log
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -19,12 +18,11 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.glureau.equalizer.audio.VisualizerData
-import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.pow
 import kotlin.math.sqrt
 
-
+// Main inspiration: https://www.shutterstock.com/fr/video/clip-771901-sound-graphic-equalizer
 @Composable
 fun FancyTubularStackedBarEqualizer(
     modifier: Modifier,
@@ -55,14 +53,6 @@ fun FancyTubularStackedBarEqualizer(
             )
 
             val stretchPow = 1.8f // tunnel effect
-            val moveRatio by rememberInfiniteTransition().animateFloat(
-                initialValue = 0f,
-                targetValue = 1f / 3f, // Because loop is computed for 3 paths
-                animationSpec = infiniteRepeatable(
-                    animation = tween(durationMillis = 2000, easing = LinearEasing),
-                    repeatMode = RepeatMode.Restart
-                )
-            )
             val rotation by rememberInfiniteTransition().animateFloat(
                 initialValue = 0f,
                 targetValue = 2f * Math.PI.toFloat(),
@@ -71,83 +61,28 @@ fun FancyTubularStackedBarEqualizer(
                     repeatMode = RepeatMode.Restart
                 )
             )
+            val ringCount = 6
 
-            val longestRadiusFactor = sqrt(2f)// Cause ratio is 1:1, diag is sqrt(2)
-            val startFactor1 = 0
-            val startFactor2 = 1f / 3f
-            val startFactor3 = 2f / 3f
-            val surfaceRatio = startFactor2 / 3f // < 1/3f
-            val endFactor1 = startFactor1 + surfaceRatio
-            val endFactor2 = startFactor2 + surfaceRatio
-            val endFactor3 = startFactor3 + surfaceRatio
-            val speedPowFactor = 5f
-
-            fun Float.curveSpaceAndTime() = 0.15f + 0.85f * pow(speedPowFactor)
-
-            val startRadius1 = (moveRatio + startFactor1).curveSpaceAndTime() * longestRadiusFactor
-            val endRadius1 = (moveRatio + endFactor1).curveSpaceAndTime() * longestRadiusFactor
-            val endRadius1Background = (moveRatio + endFactor1 + 0.1f).curveSpaceAndTime() * longestRadiusFactor
-            val startRadius2 = (moveRatio + startFactor2).curveSpaceAndTime() * longestRadiusFactor
-            val endRadius2 = (moveRatio + endFactor2).curveSpaceAndTime() * longestRadiusFactor
-            val endRadius2Background = (moveRatio + endFactor2 + 0.1f).curveSpaceAndTime() * longestRadiusFactor
-            val startRadius3 = (moveRatio + startFactor3).curveSpaceAndTime() * longestRadiusFactor
-            val endRadius3 = (moveRatio + endFactor3).curveSpaceAndTime() * longestRadiusFactor
-            val endRadius3Background = (moveRatio + endFactor3 + 0.1f).curveSpaceAndTime() * longestRadiusFactor
-
-            Log.e(
-                "GREG",
-                "startRadius1=$startRadius1 endRadius1=$endRadius1, startRadius2=$startRadius2 endRadius2=$endRadius2, startRadius3=$startRadius3 endRadius3=$endRadius3"
+            val moveRatio by rememberInfiniteTransition().animateFloat(
+                initialValue = 0f,
+                targetValue = 1f / ringCount,
+                animationSpec = infiniteRepeatable(
+                    animation = tween(durationMillis = 5000, easing = LinearEasing),
+                    repeatMode = RepeatMode.Restart
+                )
             )
 
-            val circle1 = stackedBar.circularProj(
-                viewportWidth = viewportWidth,
-                viewportHeight = viewportHeight,
-                innerRadiusRatio = startRadius1,
-                outerRadiusRatio = endRadius1,
-                stretchPow = stretchPow,
-                angleOffset = rotation,
-            ).stackToNodes()
-            val circle2 = stackedBar.circularProj(
-                viewportWidth = viewportWidth,
-                viewportHeight = viewportHeight,
-                innerRadiusRatio = startRadius2,
-                outerRadiusRatio = endRadius2,
-                stretchPow = stretchPow,
-                angleOffset = rotation,
-            ).stackToNodes()
-            val circle3 = stackedBar.circularProj(
-                viewportWidth = viewportWidth,
-                viewportHeight = viewportHeight,
-                innerRadiusRatio = startRadius3,
-                outerRadiusRatio = endRadius3,
-                stretchPow = stretchPow,
-                angleOffset = rotation,
-            ).stackToNodes()
-            val circle1Background = stackedBar.circularProj(
-                viewportWidth = viewportWidth,
-                viewportHeight = viewportHeight,
-                innerRadiusRatio = startRadius1,
-                outerRadiusRatio = endRadius1Background,
-                stretchPow = stretchPow,
-                angleOffset = rotation,
-            ).stackToNodes()
-            val circle2Background = stackedBar.circularProj(
-                viewportWidth = viewportWidth,
-                viewportHeight = viewportHeight,
-                innerRadiusRatio = startRadius2,
-                outerRadiusRatio = endRadius2Background,
-                stretchPow = stretchPow,
-                angleOffset = rotation,
-            ).stackToNodes()
-            val circle3Background = stackedBar.circularProj(
-                viewportWidth = viewportWidth,
-                viewportHeight = viewportHeight,
-                innerRadiusRatio = startRadius3,
-                outerRadiusRatio = endRadius3Background,
-                stretchPow = stretchPow,
-                angleOffset = rotation,
-            ).stackToNodes()
-
+            val rings = (0..ringCount).map { index ->
+                buildRing(
+                    stackedBar,
+                    index, ringCount,
+                    moveRatio, rotation,
+                    speedPowFactor = 10f, surfaceFactor = 0.5f, stretchPow = stretchPow,
+                    secondSurfaceFactor = 1.4f,
+                    viewportWidth = viewportWidth,
+                    viewportHeight = viewportHeight,
+                )
+            }
 
             val vectorPainter = rememberVectorPainter(
                 defaultWidth = viewportWidth.dp,
@@ -155,50 +90,7 @@ fun FancyTubularStackedBarEqualizer(
                 viewportWidth = viewportWidth,
                 viewportHeight = viewportHeight,
             ) { vw, vh ->
-                Path(
-                    fill = Brush.radialGradient(listOf(Color(0xff9575cd), Color(0x409575cd))),
-                    pathData = circle1Background
-                )
-
-                Path(
-                    fill = Brush.radialGradient(
-                        startRadius1 to Color(0xffb3e5fc),
-                        startRadius1 + (endRadius1 - startRadius1) / 2f to Color(0xffffffff),
-                        endRadius1 to Color(0xff9575cd),
-                    ),
-                    fillAlpha = (moveRatio * 3).coerceAtMost(1f),
-                    pathData = circle1
-                )
-
-                Path(
-                    fill = Brush.radialGradient(listOf(Color(0xff9575cd), Color(0x409575cd))),
-                    pathData = circle2Background
-                )
-
-
-                Path(
-                    fill = Brush.radialGradient(
-                        startRadius2 to Color(0xffb3e5fc),
-                        startRadius2 + (endRadius2 - startRadius2) / 2f to Color(0xffffffff),
-                        endRadius2 to Color(0xff9575cd),
-                    ),
-                    pathData = circle2
-                )
-
-                Path(
-                    fill = Brush.radialGradient(listOf(Color(0xff9575cd), Color(0x409575cd))),
-                    pathData = circle3Background
-                )
-
-                Path(
-                    fill = Brush.radialGradient(
-                        startRadius3 to Color(0xffb3e5fc),
-                        startRadius3 + (endRadius3 - startRadius3) / 2f to Color(0xffffffff),
-                        endRadius3 to Color(0xff9575cd),
-                        radius = max(viewportWidth / 2f, viewportHeight / 2f)
-                    ),
-                    pathData = circle3
-                )
+                rings.forEach { it() }
             }
             Image(
                 painter = vectorPainter,
@@ -207,14 +99,74 @@ fun FancyTubularStackedBarEqualizer(
                     Brush.radialGradient(
                         listOf(
                             Color(0xffffffff),
-                            Color(0xff9575cd),
+                            //Color(0xff9575cd),
+                            Color(0xff3C37CA),
                             Color(0xff000000),
                         ),
-                        radius = min(viewportWidth, viewportHeight) / 5f
+                        radius = min(viewportWidth, viewportHeight) / 7f
                     )
                 )
             )
         }
+    }
+}
+
+fun Float.curveSpaceAndTime(speedPowFactor: Float) = 0.15f + 0.85f * pow(speedPowFactor)
+
+@Composable
+fun buildRing(
+    stackedBar: List<Point>,
+    ringIndex: Int, ringCount: Int,
+    moveRatio: Float, rotation: Float,
+    speedPowFactor: Float, surfaceFactor: Float, stretchPow: Float, secondSurfaceFactor: Float,
+    viewportWidth: Float, viewportHeight: Float
+): @Composable () -> Unit {
+    val longestRadiusFactor = sqrt(2f)// Cause ratio is 1:1, diag is sqrt(2)
+    val startFactor = ringIndex.toFloat() / ringCount
+    val surfaceRatio = surfaceFactor / ringCount
+
+    val startRadius =
+        (moveRatio + startFactor).curveSpaceAndTime(speedPowFactor) * longestRadiusFactor
+    val endRadius =
+        (moveRatio + startFactor + surfaceRatio).curveSpaceAndTime(speedPowFactor) * longestRadiusFactor
+    val endRadiusBackground =
+        (moveRatio + startFactor + surfaceRatio * secondSurfaceFactor).curveSpaceAndTime(speedPowFactor) * longestRadiusFactor
+
+    val circle = stackedBar.circularProj(
+        viewportWidth = viewportWidth,
+        viewportHeight = viewportHeight,
+        innerRadiusRatio = startRadius,
+        outerRadiusRatio = endRadius,
+        stretchPow = stretchPow,
+        angleOffset = rotation,
+    ).stackToNodes()
+
+    val circleBackground = stackedBar.circularProj(
+        viewportWidth = viewportWidth,
+        viewportHeight = viewportHeight,
+        innerRadiusRatio = startRadius,
+        outerRadiusRatio = endRadiusBackground,
+        stretchPow = stretchPow,
+        angleOffset = rotation,
+    ).stackToNodes()
+    return {
+        Path(
+            fill = Brush.radialGradient(
+                endRadius to Color(0x709575cd),
+                endRadiusBackground to Color(0x109575cd),
+            ),
+            pathData = circleBackground
+        )
+
+        Path(
+            fill = Brush.radialGradient(
+                startRadius to Color(0xffb3e5fc),
+                startRadius + (endRadius - startRadius) / 2f to Color(0xffffffff),
+                endRadius to Color(0xff9575cd),
+            ),
+            fillAlpha = if (ringIndex == 0) (moveRatio * 3).coerceAtMost(1f) else 1f,
+            pathData = circle
+        )
     }
 }
 

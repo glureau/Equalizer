@@ -5,7 +5,6 @@ import android.Manifest
 import android.app.Activity
 import android.content.pm.PackageManager
 import android.media.audiofx.Visualizer
-import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 
@@ -27,7 +26,7 @@ class VisualizerComputer {
 
         val CAPTURE_SIZE = Visualizer.getCaptureSizeRange()[1]
 
-        const val SAMPLING_INTERVAL = 150
+        const val SAMPLING_INTERVAL = 100
     }
 
     private var visualizer: Visualizer? = null

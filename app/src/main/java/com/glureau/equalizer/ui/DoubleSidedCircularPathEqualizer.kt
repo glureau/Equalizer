@@ -55,8 +55,6 @@ fun DoubleSidedCircularPathEqualizer(
             val count = circularProj.size
             val halfCount = count / 2
             val offset = halfCount - 1
-            Log.e("DEV", "TOP=" + circularProj.subList(0, halfCount).joinToString())
-            Log.e("DEV", "BOTTOM=" + circularProj.subList(halfCount, count).joinToString())
             pathData += PathNode.MoveTo(circularProj[offset].x(), circularProj[offset].y())
             for (i in 0..halfCount - 1) {
                 val prevprev = circularProj[(i - 2 + halfCount) % halfCount]
@@ -67,7 +65,6 @@ fun DoubleSidedCircularPathEqualizer(
                 val tangentCurrent = prev - next
                 val control1 = prev + tangentPrev * 0.2f
                 val control2 = current + tangentCurrent * 0.2f
-                Log.e("DEV", "$i - prevprev=$prevprev prev=$prev current=$current next=$next")
                 pathData += PathNode.CurveTo(
                     control1.x(), control1.y(),
                     control2.x(), control2.y(),
@@ -85,14 +82,12 @@ fun DoubleSidedCircularPathEqualizer(
                 val tangentCurrent = prev - next
                 val control1 = prev + tangentPrev * 0.2f
                 val control2 = current + tangentCurrent * 0.2f
-                Log.e("DEV", "$i - prevprev=$prevprev prev=$prev current=$current next=$next")
                 pathData += PathNode.CurveTo(
                     control1.x(), control1.y(),
                     control2.x(), control2.y(),
                     current.x(), current.y()
                 )
             }
-            Log.e("DEV", pathData.joinToString("\n"))
 
             val firstPoint = circularProj.first()
             val firstPath = PathNode.MoveTo(firstPoint.x(), firstPoint.y())
